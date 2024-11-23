@@ -5,6 +5,7 @@ from flashbdev import bdev
 try:
     if bdev:
         vfs.mount(bdev, "/")
+    print("Boot hello!")
 except OSError:
     import inisetup
 
