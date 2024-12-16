@@ -1,16 +1,34 @@
 import os
+import gc
 import time
 import ujson
 import machine
 import network
 import esp
+import esp32
 
 from ssl import SSLContext
 from ssl import PROTOCOL_TLS_CLIENT
 
 esp.osdebug(True, esp.LOG_DEBUG)
 
-thing_name = "000004"
+print("Loading values from NVS:")
+nvs = esp32.NVS("certs")
+#thing_name = "000004"
+buffer = bytearray(2048)
+nvs.get_nvsstr("thingname",buffer)
+thing_name = str(buffer.decode().strip('\x00'))
+print("ThingName " + thing_name)
+
+nvs.get_nvsstr("certificate", buffer)
+cert = bytes(buffer.decode().strip('\x00'), 'utf-8')
+#print("Cert: " + cert)
+
+nvs.get_nvsstr("priv_key", buffer)
+key = bytes(buffer.decode().strip('\x00'), 'utf-8')
+#print("Key: " + key)
+
+
 configTopic = "/" + thing_name + "/config"
 
 theDisplay = None  #this will be set later as an object defined by a class in a dynamically loaded python file
@@ -28,10 +46,10 @@ resubscribeRequired = True
 #openssl rsa -inform pem -in private.key -outform der -out key.der
 
 #cert and key must be in der form
-with open('key.der','rb') as f:
-    KEY=f.read()
-with open('cert.der', 'rb') as f:
-    CERT=f.read()
+# with open('key.der','rb') as f:
+#     KEY=f.read()
+# with open('cert.der', 'rb') as f:
+#     CERT=f.read()
 
 #We need a robust MQTT client that handles disonnects and unreliable wifi
 #clone this repo somewhere else, and then symlink the mqtt_as folder into the modules folder
@@ -102,6 +120,7 @@ async def main(client):
     await client.connect()
     while True:
         #print(resubscribeRequired, subscriptions)
+        gc.collect()
         if resubscribeRequired:
             await subscribeToAll(client, subscriptions)
         await asyncio.sleep(10)  # Broker is slow        
@@ -112,7 +131,7 @@ config['subs_cb'] = sub_cb
 config['connect_coro'] = conn_han
 config['wifi_coro'] = wifi_han
 config['ssl'] = True
-config['ssl_params'] = {'do_handshake':False, 'key':KEY, 'cert':CERT} 
+config['ssl_params'] = {'do_handshake':False, 'key':key, 'cert':cert} 
 # Not needed if you're only using ESP8266
 config['ssid'] = 'CritterNet'
 config['wifi_pw'] = 'CharlieCat'

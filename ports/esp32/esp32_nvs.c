@@ -114,6 +114,22 @@ static mp_obj_t esp32_nvs_get_blob(mp_obj_t self_in, mp_obj_t key_in, mp_obj_t v
 }
 static MP_DEFINE_CONST_FUN_OBJ_3(esp32_nvs_get_blob_obj, esp32_nvs_get_blob);
 
+//MJW added
+// esp32_nvs_get_nvsstr reads a string value into a buffer. Returns actual length.
+static mp_obj_t esp32_nvs_get_nvsstr(mp_obj_t self_in, mp_obj_t key_in, mp_obj_t value_in) {
+    esp32_nvs_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    const char *key = mp_obj_str_get_str(key_in);
+    // get buffer to be filled
+    mp_buffer_info_t value;
+    mp_get_buffer_raise(value_in, &value, MP_BUFFER_WRITE);
+    size_t length = value.len;
+    // fill the buffer with the value, will raise an esp-idf error if the length of
+    // the provided buffer (bytearray) is too small
+    check_esp_err(nvs_get_str(self->namespace, key, value.buf, &length));
+    return MP_OBJ_NEW_SMALL_INT(length);
+}
+static MP_DEFINE_CONST_FUN_OBJ_3(esp32_nvs_get_nvsstr_obj, esp32_nvs_get_nvsstr);
+
 // esp32_nvs_erase_key erases one key.
 static mp_obj_t esp32_nvs_erase_key(mp_obj_t self_in, mp_obj_t key_in) {
     esp32_nvs_obj_t *self = MP_OBJ_TO_PTR(self_in);
@@ -135,6 +151,7 @@ static const mp_rom_map_elem_t esp32_nvs_locals_dict_table[] = {
     { MP_ROM_QSTR(MP_QSTR_get_i32), MP_ROM_PTR(&esp32_nvs_get_i32_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_i32), MP_ROM_PTR(&esp32_nvs_set_i32_obj) },
     { MP_ROM_QSTR(MP_QSTR_get_blob), MP_ROM_PTR(&esp32_nvs_get_blob_obj) },
+    { MP_ROM_QSTR(MP_QSTR_get_nvsstr), MP_ROM_PTR(&esp32_nvs_get_nvsstr_obj) },
     { MP_ROM_QSTR(MP_QSTR_set_blob), MP_ROM_PTR(&esp32_nvs_set_blob_obj) },
     { MP_ROM_QSTR(MP_QSTR_erase_key), MP_ROM_PTR(&esp32_nvs_erase_key_obj) },
     { MP_ROM_QSTR(MP_QSTR_commit), MP_ROM_PTR(&esp32_nvs_commit_obj) },

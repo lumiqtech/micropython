@@ -2,5 +2,6 @@
     "idf.adapterTargetName": "esp32s3",
     "idf.openOcdConfigs": [
         "board/esp32-bridge.cfg"
-    ]
+    ],
+    "idf.port": "/dev/tty.usbserial-14320"
 }

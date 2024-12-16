@@ -9,6 +9,9 @@ cmake_minimum_required(VERSION 3.12)
 include($ENV{IDF_PATH}/tools/cmake/version.cmake)
 set(IDF_VERSION "${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}.${IDF_VERSION_PATCH}")
 
+#MJW
+set(MICROPY_BOARD ESP32_LUMIQ)
+
 # Set the board if it's not already set.
 if(NOT MICROPY_BOARD)
     set(MICROPY_BOARD ESP32_GENERIC)

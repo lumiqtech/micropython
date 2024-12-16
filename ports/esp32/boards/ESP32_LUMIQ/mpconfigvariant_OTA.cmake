@@ -1,0 +1,8 @@
+set(SDKCONFIG_DEFAULTS
+    ${SDKCONFIG_DEFAULTS}
+    boards/ESP32_LUMIQ/sdkconfig.ota
+)
+
+list(APPEND MICROPY_DEF_BOARD
+    MICROPY_HW_BOARD_NAME="ESP32 LUMIQ module with OTA"
+)

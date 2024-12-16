@@ -1,7 +1,6 @@
 # Makefile for MicroPython on ESP32.
 #
 # This is a simple, convenience wrapper around idf.py (which uses cmake).
-
 # Select the board to build for:
 ifdef BOARD_DIR
 # Custom board path - remove trailing slash and get the final component of
